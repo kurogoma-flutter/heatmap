@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
             // テストデータ
             {DateTime(2023, 1, 1): 1},
             {DateTime(2022, 1, 2): 2},
-            {DateTime(2022, 1, 3): 6},
-            {DateTime(2023, 1, 4): 3},
-            {DateTime(2023, 1, 5): 4},
+            {DateTime(2022, 1, 3): 3},
+            {DateTime(2023, 1, 4): 4},
+            {DateTime(2023, 1, 5): 5},
             // 3月中旬データ
             {DateTime(2023, 3, 1): 1},
             {DateTime(2023, 3, 2): 2},
@@ -34,14 +34,14 @@ class MyApp extends StatelessWidget {
             {DateTime(2022, 3, 10): 5},
             // 5月データ
             {DateTime(2023, 5, 1): 5},
-            {DateTime(2023, 5, 2): 4},
-            {DateTime(2023, 5, 3): 4},
-            {DateTime(2023, 5, 4): 9},
-            {DateTime(2023, 5, 5): 6},
+            {DateTime(2023, 5, 2): 3},
+            {DateTime(2023, 5, 3): 2},
+            {DateTime(2023, 5, 4): 4},
+            {DateTime(2023, 5, 5): 1},
             // 8月データ
             {DateTime(2023, 8, 1): 5},
             {DateTime(2023, 8, 2): 10},
-            {DateTime(2023, 8, 3): 11},
+            {DateTime(2023, 8, 3): 6},
             {DateTime(2023, 8, 4): 4},
             // 12月データ
             {DateTime(2023, 12, 1): 1},
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
             10: Color(0xFF027C06),
           },
           cellSize: 14,
-          targetYear: 2022,
+          targetYear: 2023,
         ),
       ),
     );
