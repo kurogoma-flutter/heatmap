@@ -16,8 +16,21 @@ class MyApp extends StatelessWidget {
           data: [
             // テストデータ
             {DateTime(2023, 1, 1): 1},
-            {DateTime(2023, 1, 2): 2},
-            {DateTime(2023, 1, 3): 6},
+            {DateTime(2022, 1, 2): 2},
+            {DateTime(2022, 1, 3): 6},
+            {DateTime(2023, 1, 4): 3},
+            {DateTime(2023, 1, 5): 4},
+            // 3月中旬データ
+            {DateTime(2023, 3, 1): 1},
+            {DateTime(2023, 3, 2): 2},
+            {DateTime(2023, 3, 3): 3},
+            {DateTime(2023, 3, 4): 4},
+            {DateTime(2023, 3, 5): 5},
+            {DateTime(2022, 3, 6): 1},
+            {DateTime(2022, 3, 7): 2},
+            {DateTime(2022, 3, 8): 3},
+            {DateTime(2022, 3, 9): 4},
+            {DateTime(2022, 3, 10): 5},
             // 5月データ
             {DateTime(2023, 5, 1): 5},
             {DateTime(2023, 5, 2): 4},
@@ -44,6 +57,7 @@ class MyApp extends StatelessWidget {
           },
           cellSize: 16.0,
           padding: const EdgeInsets.all(4.0),
+          targetYear: 2023,
         ),
       ),
     );
@@ -56,6 +70,7 @@ class Heatmap extends StatefulWidget {
   final double cellSize;
   final EdgeInsets padding;
   final Color? defaultColor;
+  final int? targetYear;
 
   const Heatmap({
     super.key,
@@ -64,6 +79,7 @@ class Heatmap extends StatefulWidget {
     this.cellSize = 16.0,
     this.padding = const EdgeInsets.all(0.0),
     this.defaultColor,
+    this.targetYear,
   });
 
   @override
@@ -97,6 +113,7 @@ class _HeatmapState extends State<Heatmap> {
                   data: widget.data,
                   colorSet: widget.colorSet,
                   cellSize: widget.cellSize,
+                  targetYear: widget.targetYear,
                   onTapCell: (date) {
                     setState(() {
                       _selectedDate = date;
@@ -151,19 +168,21 @@ class _HeatmapState extends State<Heatmap> {
 }
 
 class HeatmapPainter extends CustomPainter {
+  HeatmapPainter({
+    required this.data,
+    this.colorSet = const {},
+    this.cellSize = 16.0,
+    this.onTapCell,
+    this.defaultColor,
+    this.targetYear,
+  });
+
   final List<Map<DateTime, int>> data;
   final Map<int, Color> colorSet;
   final double cellSize;
   final void Function(DateTime date)? onTapCell;
   final Color? defaultColor;
-
-  HeatmapPainter({
-    this.data = const [],
-    this.colorSet = const {},
-    this.cellSize = 16.0,
-    this.onTapCell,
-    this.defaultColor,
-  });
+  final int? targetYear;
 
   @override
   bool? hitTest(Offset position) {
@@ -171,9 +190,13 @@ class HeatmapPainter extends CustomPainter {
     int week = (position.dx ~/ cellSize).toInt();
     int day = (position.dy ~/ cellSize).toInt();
 
-    DateTime selectedDate = DateTime(DateTime.now().year, 1, 1)
-        .add(Duration(days: (week * 7) + day));
-    onTapCell!(selectedDate);
+    int targetYearNumber = targetYear ?? DateTime.now().year;
+
+    DateTime selectedDate =
+        DateTime(targetYearNumber, 1, 1).add(Duration(days: (week * 7) + day));
+    if (onTapCell != null) {
+      onTapCell!(selectedDate);
+    }
 
     return super.hitTest(position);
   }
@@ -189,16 +212,28 @@ class HeatmapPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     double borderThickness = 0.5;
-    DateTime currentYearStartDate = DateTime(DateTime.now().year, 1, 1);
+
+    int targetYearNumber = targetYear ?? DateTime.now().year;
+
+    DateTime currentYearStartDate = DateTime(targetYearNumber, 1, 1);
+
+    // Filter data for the target year
+    List<Map<DateTime, int>> filteredData = data
+        .where((item) => item.keys.any((key) => key.year == targetYearNumber))
+        .toList();
+    print(filteredData);
 
     for (int week = 0; week < (365 ~/ 7); week++) {
       for (int day = 0; day < 7; day++) {
         double x = week * cellSize;
         double y = day * cellSize;
 
-        Map<DateTime, int>? matchingData = data.firstWhere(
-            (item) => item.containsKey(
-                currentYearStartDate.add(Duration(days: (week * 7) + day))),
+        DateTime currentCellDate =
+            currentYearStartDate.add(Duration(days: (week * 7) + day));
+
+        Map<DateTime, int>? matchingData = filteredData.firstWhere(
+            (item) =>
+                item.keys.any((key) => key.isAtSameMomentAs(currentCellDate)),
             orElse: () => {});
 
         Color cellColor = Colors.grey[300]!;
